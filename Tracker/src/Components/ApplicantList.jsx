@@ -33,6 +33,7 @@ export default function ApplicantList() {
     schoolYear: '',
     program: '',
     status: 'Pending',
+    notification: ''
   });
 
   // List of available statuses for filter and dropdown
@@ -51,7 +52,7 @@ export default function ApplicantList() {
   const handleAddApplicant = () => {
     const id = applicants.length + 1;
     setApplicants([...applicants, { id, ...newApplicant }]);
-    setNewApplicant({ name: '', college: '', schoolYear: '', program: '', status: 'Pending' });
+    setNewApplicant({ name: '', college: '', schoolYear: '', program: '', status: 'Pending', notification:''});
     setShowAddModal(false);
   };
 
@@ -201,6 +202,12 @@ export default function ApplicantList() {
                   <option key={status} value={status}>{status}</option>
                 ))}
               </select>
+              <textarea
+                placeholder="Notification message to send to applicant"
+                value={newApplicant.notification}
+                onChange={(e) => setNewApplicant({ ...newApplicant, notification: e.target.value })}
+                className="w-full border px-3 py-2 rounded"
+              />
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <button onClick={() => setShowAddModal(false)} className="px-3 py-2 bg-gray-200 rounded">Cancel</button>
