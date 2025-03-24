@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { IoIosArrowDown } from 'react-icons/io';
 import { BsThreeDotsVertical } from 'react-icons/bs';
@@ -14,17 +15,7 @@ export default function ApplicantList() {
   const [showAddModal, setShowAddModal] = useState(false);
 
   // Main applicant list 
-  const [applicants, setApplicants] = useState([
-    { id: 1, name: 'Carpio, Aleck Joy', college: 'College of Technology', schoolYear: '2024-2025', program: 'Bachelor of Science in Information Technology', status: 'Pending' },
-    { id: 2, name: 'Dela Cruz, Juan', college: 'College of Business Administration', schoolYear: '2024-2025', program: 'Bachelor of Science in Business Administration', status: 'Pending' },
-    { id: 3, name: 'Dela Cruz, Juan', college: 'College of Education', schoolYear: '2024-2025', program: 'Bachelor of Secondary Education', status: 'Under Review' },
-    { id: 4, name: 'Del Valle, Maxpein Zin', college: 'College of Education', schoolYear: '2024-2025', program: 'Bachelor of Special Needs Education', status: 'Under Review' },
-    { id: 5, name: 'Dondoyano, Carl Joshua', college: 'College of Technology', schoolYear: '2024-2025', program: 'Bachelor of Science in Information Technology', status: 'Missing' },
-    { id: 6, name: 'Ignacio, Mark Eleazar', college: 'College of Technology', schoolYear: '2024-2025', program: 'Bachelor of Science in Information Technology', status: 'Rejected' },
-    { id: 7, name: 'Ondevilla, Zadkiel', college: 'College of Technology', schoolYear: '2024-2025', program: 'Bachelor of Science in Information Technology', status: 'Accepted' },
-    { id: 8, name: 'Salinas, Julius Louise', college: 'College of Technology', schoolYear: '2024-2025', program: 'Bachelor of Science in Information Technology', status: 'Accepted' },
-    { id: 9, name: 'Quivolok, Apolthar', college: 'College of Business Administration', schoolYear: '2024-2025', program: 'Bachelor of Science in Business Administration', status: 'Overdue' },
-  ]);
+  const [applicants, setApplicants] = useState([]);
 
   // State to hold input values for new applicant form
   const [newApplicant, setNewApplicant] = useState({
@@ -35,6 +26,25 @@ export default function ApplicantList() {
     status: 'Pending',
     notification: ''
   });
+
+  useEffect(() => {
+    fetch("http://localhost/Application-Status-Tracking/Tracker/php/get_applicants.php")
+      .then((response) => response.json())
+      .then((data) => {
+        // Convert data to match React field names if needed
+        const formatted = data.map(a => ({
+          id: a.id,
+          name: a.applicant_name,
+          college: a.college,
+          schoolYear: a.school_year,
+          program: a.program,
+          status: a.status,
+          notification: a.notification
+        }));
+        setApplicants(formatted);
+      })
+      .catch((error) => console.error("Error fetching applicants:", error));
+  }, []);
 
   // List of available statuses for filter and dropdown
   const statusOptions = ['Pending', 'Under Review', 'Missing', 'Rejected', 'Accepted', 'Overdue'];
@@ -50,11 +60,76 @@ export default function ApplicantList() {
 
   // Add new applicant to the state list and close modal
   const handleAddApplicant = () => {
-    const id = applicants.length + 1;
-    setApplicants([...applicants, { id, ...newApplicant }]);
-    setNewApplicant({ name: '', college: '', schoolYear: '', program: '', status: 'Pending', notification:''});
-    setShowAddModal(false);
+    fetch("http://localhost/Application-Status-Tracking/Tracker/php/add_applicant.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(newApplicant)
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("Applicant added successfully.");
+          setShowAddModal(false);
+          setNewApplicant({ name: '', college: '', schoolYear: '', program: '', status: 'Pending', notification: '' });
+  
+          // Reload updated list
+          fetch("http://localhost/Application-Status-Tracking/Tracker/php/get_applicants.php")
+            .then((response) => response.json())
+            .then((data) => {
+              const formatted = data.map(a => ({
+                id: a.id,
+                name: a.applicant_name,
+                college: a.college,
+                schoolYear: a.school_year,
+                program: a.program,
+                status: a.status,
+                notification: a.notification
+              }));
+              setApplicants(formatted);
+            });
+        } else {
+          alert("Failed to add applicant.");
+        }
+      })
+      .catch((error) => console.error("Error adding applicant:", error));
   };
+  
+  const handleUpdateStatus = (id, newStatus, notification = '') => {
+    fetch("http://localhost/Application-Status-Tracking/Tracker/php/update_status.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ id, status: newStatus, notification })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("Status updated.");
+          // Refresh applicant list
+          fetch("http://localhost/Application-Status-Tracking/Tracker/php/get_applicants.php")
+            .then((response) => response.json())
+            .then((data) => {
+              const formatted = data.map(a => ({
+                id: a.id,
+                name: a.applicant_name,
+                college: a.college,
+                schoolYear: a.school_year,
+                program: a.program,
+                status: a.status,
+                notification: a.notification
+              }));
+              setApplicants(formatted);
+            });
+        } else {
+          alert("Failed to update status.");
+        }
+      })
+      .catch((error) => console.error("Error updating status:", error));
+  };
+  
 
   return (
     <div className="p-6 w-full">
