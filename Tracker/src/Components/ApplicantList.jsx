@@ -1,8 +1,18 @@
 import { useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
+import { IoIosArrowDown } from 'react-icons/io';
+import { BsThreeDotsVertical } from 'react-icons/bs';
+
+
+
 
 export default function ApplicantList() {
   const [search, setSearch] = useState('');
+  const [showFilter, setShowFilter] = useState(false);
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
+
+
+
 
   // Placeholder for backend fetched data
   const applicants = [
@@ -18,25 +28,75 @@ export default function ApplicantList() {
     
   ];
 
-  const filteredApplicants = applicants.filter((a) =>
-    a.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const statusOptions = [
+    'Pending', 'Under Review', 'Missing', 'Rejected', 'Accepted', 'Overdue'
+  ];
+
+  
+  const filteredApplicants = applicants.filter((a) => {
+    const matchesSearch = a.name.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(a.status);
+    return matchesSearch && matchesStatus;
+  });
+
 
   return (
     <div className="p-6 w-full">
       <h1 className="text-3xl font-bold mb-4">Applicant List</h1>
-      <div className="relative max-w-md w-full mb-4">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search applicants..."
-          className="w-full border border-gray-300 px-4 py-2 rounded-lg "
-        />
-        <button className="absolute right-5 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-800">
-          <FaSearch size={18} />
-        </button>
+      <div className="flex justify-between items-center mb-4">
+        <div className="relative max-w-md w-full">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search applicants..."
+            className="w-full border border-gray-300 px-4 py-2 rounded-lg"
+          />
+          <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-800">
+            <FaSearch size={18} />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+        <button
+            
+            className="flex items-center border px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200"
+          >
+            <BsThreeDotsVertical className="mr-2" /> Action
+          </button>
+          <button
+            onClick={() => setShowFilter(!showFilter)}
+            className="flex items-center border px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200"
+          >
+            <IoIosArrowDown className="mr-1" /> Filter
+          </button>
+        </div>
       </div>
+
+      {showFilter && (
+        <div className="mb-4 bg-white p-4 border rounded shadow-sm text-sm">
+          <p className="font-semibold mb-2 text-gray-700">Filter by Status:</p>
+          <div className="grid grid-cols-2 gap-2">
+            {statusOptions.map((status) => (
+              <label key={status} className="inline-flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={selectedStatuses.includes(status)}
+                  onChange={() =>
+                    setSelectedStatuses((prev) =>
+                      prev.includes(status)
+                        ? prev.filter((s) => s !== status)
+                        : [...prev, status]
+                    )
+                  }
+                  className="accent-purple-600"
+                />
+                {status}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="overflow-x-auto border">
         <table className="table-auto w-full text-sm border border-black">
@@ -75,6 +135,8 @@ export default function ApplicantList() {
           <button className="px-2 py-1 bg-gray-200 border">&gt;</button>
         </div>
       </div>
+
+  
     </div>
   );
 }
