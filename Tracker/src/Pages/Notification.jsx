@@ -1,24 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../Components/Header';
 import Sidebar from '../Components/Sidebar';
 import NotificationPanel from '../Components/NotificationPanel';
 
 function Notification() {
-  const currentUserId = 1; // WALA PANG ACC SO UNG CURRENTA CC IS 1
+  const currentUserName = "Andrei Rosca"; // ✨ The name you want to filter by
 
-  const [applicants, setApplicants] = useState([
-    { id: 1, name: 'Tom Yang University', status: 'Accepted', notification: 'HELLO' },
-    { id: 2, name: 'Tom Yang University', status: 'Under Review', notification: '' },
-    { id: 3, name: 'Schedule of Interview', status: 'Interview Scheduled', notification: '' },
-    { id: 4, name: 'The missing document has been received', status: 'Under Review', notification: '' },
-    { id: 5, name: 'Missing Documents Duedate', status: 'Overdue', notification: '' },
-    { id: 6, name: 'Missing Document', status: 'Reviewed', notification: '' },
-    { id: 7, name: 'Document On Review', status: 'Under Review', notification: '' },
-    { id: 8, name: 'Documents Submitted', status: 'Pending Submission', notification: '' },
-  ]);
+  const [applicants, setApplicants] = useState([]);
 
-  // Get only the current user's notifications
-  const userNotifications = applicants.filter(a => a.id === currentUserId);
+  useEffect(() => {
+    fetch("http://localhost/Application-Status-Tracking/Tracker/php/get_applicants.php")
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map(a => ({
+          id: a.id,
+          name: a.applicant_name,
+          status: a.status,
+          notification: a.notification
+        }));
+        setApplicants(formatted);
+      })
+      .catch((error) => console.error("Error fetching notifications:", error));
+  }, []);
+
+  const userNotifications = applicants.filter(a =>
+    a.name === currentUserName && a.notification && a.notification.trim() !== ""
+  );
 
   return (
     <div className="flex flex-col h-screen">
