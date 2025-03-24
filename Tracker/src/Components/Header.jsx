@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 
 
+
 function Header() {
   return (
     <header className='bg-purple-700 text-white px-7 py-2 flex justify-between items-center '>
@@ -19,7 +20,7 @@ function Header() {
             <Link to="/contact">
                 <FaPhone className="cursor-pointer" />
             </Link>
-            <Link to="/notifications">
+            <Link to="/notification">
                 <FaBell className="cursor-pointer" />
             </Link>
             <Link to="/profile">
