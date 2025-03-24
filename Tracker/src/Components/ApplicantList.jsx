@@ -15,21 +15,22 @@ export default function ApplicantList() {
 
   // Main applicant list 
   const [applicants, setApplicants] = useState([
-    { id: 1, name: 'Carpio, Aleck Joy', college: 'College of Technology', program: 'Bachelor of Science in Information Technology', status: 'Pending' },
-    { id: 2, name: 'Dela Cruz, Juan', college: 'College of Business Administration', program: 'Bachelor of Science in Business Administration', status: 'Pending' },
-    { id: 3, name: 'Dela Cruz, Juan', college: 'College of Education', program: 'Bachelor of Secondary Education', status: 'Under Review' },
-    { id: 4, name: 'Del Valle, Maxpein Zin', college: 'College of Education', program: 'Bachelor of Special Needs Education', status: 'Under Review' },
-    { id: 5, name: 'Dondoyano, Carl Joshua', college: 'College of Technology', program: 'Bachelor of Science in Information Technology', status: 'Missing' },
-    { id: 6, name: 'Ignacio, Mark Eleazar', college: 'College of Technology', program: 'Bachelor of Science in Information Technology', status: 'Rejected' },
-    { id: 7, name: 'Ondevilla, Zadkiel', college: 'College of Technology', program: 'Bachelor of Science in Information Technology', status: 'Accepted' },
-    { id: 8, name: 'Salinas, Julius Louise', college: 'College of Technology', program: 'Bachelor of Science in Information Technology', status: 'Accepted' },
-    { id: 9, name: 'Quivolok, Apolthar', college: 'College of Business Administration', program: 'Bachelor of Science in Business Administration', status: 'Overdue' },
+    { id: 1, name: 'Carpio, Aleck Joy', college: 'College of Technology', schoolYear: '2024-2025', program: 'Bachelor of Science in Information Technology', status: 'Pending' },
+    { id: 2, name: 'Dela Cruz, Juan', college: 'College of Business Administration', schoolYear: '2024-2025', program: 'Bachelor of Science in Business Administration', status: 'Pending' },
+    { id: 3, name: 'Dela Cruz, Juan', college: 'College of Education', schoolYear: '2024-2025', program: 'Bachelor of Secondary Education', status: 'Under Review' },
+    { id: 4, name: 'Del Valle, Maxpein Zin', college: 'College of Education', schoolYear: '2024-2025', program: 'Bachelor of Special Needs Education', status: 'Under Review' },
+    { id: 5, name: 'Dondoyano, Carl Joshua', college: 'College of Technology', schoolYear: '2024-2025', program: 'Bachelor of Science in Information Technology', status: 'Missing' },
+    { id: 6, name: 'Ignacio, Mark Eleazar', college: 'College of Technology', schoolYear: '2024-2025', program: 'Bachelor of Science in Information Technology', status: 'Rejected' },
+    { id: 7, name: 'Ondevilla, Zadkiel', college: 'College of Technology', schoolYear: '2024-2025', program: 'Bachelor of Science in Information Technology', status: 'Accepted' },
+    { id: 8, name: 'Salinas, Julius Louise', college: 'College of Technology', schoolYear: '2024-2025', program: 'Bachelor of Science in Information Technology', status: 'Accepted' },
+    { id: 9, name: 'Quivolok, Apolthar', college: 'College of Business Administration', schoolYear: '2024-2025', program: 'Bachelor of Science in Business Administration', status: 'Overdue' },
   ]);
 
   // State to hold input values for new applicant form
   const [newApplicant, setNewApplicant] = useState({
     name: '',
     college: '',
+    schoolYear: '',
     program: '',
     status: 'Pending',
   });
@@ -50,7 +51,7 @@ export default function ApplicantList() {
   const handleAddApplicant = () => {
     const id = applicants.length + 1;
     setApplicants([...applicants, { id, ...newApplicant }]);
-    setNewApplicant({ name: '', college: '', program: '', status: 'Pending' });
+    setNewApplicant({ name: '', college: '', schoolYear: '', program: '', status: 'Pending' });
     setShowAddModal(false);
   };
 
@@ -124,6 +125,7 @@ export default function ApplicantList() {
               <th className="border border-black px-2 py-1">No.</th>
               <th className="border border-black px-2 py-1">Applicants Name</th>
               <th className="border border-black px-2 py-1">College</th>
+              <th className="border border-black px-2 py-1">School Year</th>
               <th className="border border-black px-2 py-1">Program</th>
               <th className="border border-black px-2 py-1">Status</th>
             </tr>
@@ -134,6 +136,7 @@ export default function ApplicantList() {
                 <td className="border border-black px-2 py-1">{index + 1}</td>
                 <td className="border border-black px-2 py-1">{a.name}</td>
                 <td className="border border-black px-2 py-1">{a.college}</td>
+                <td className="border border-black px-2 py-1">{a.schoolYear}</td>
                 <td className="border border-black px-2 py-1">{a.program}</td>
                 <td className="border border-black px-2 py-1">{a.status}</td>
               </tr>
@@ -173,6 +176,13 @@ export default function ApplicantList() {
                 placeholder="College"
                 value={newApplicant.college}
                 onChange={(e) => setNewApplicant({ ...newApplicant, college: e.target.value })}
+                className="w-full border px-3 py-2 rounded"
+              />
+              <input
+                type="text"
+                placeholder="School Year"
+                value={newApplicant.schoolYear}
+                onChange={(e) => setNewApplicant({ ...newApplicant, schoolYear: e.target.value })}
                 className="w-full border px-3 py-2 rounded"
               />
               <input
