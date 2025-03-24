@@ -13,7 +13,7 @@ export default function ApplicantList() {
   // State to show/hide Add Applicant modal
   const [showAddModal, setShowAddModal] = useState(false);
 
-  // Main applicant list (mocked as in-memory state)
+  // Main applicant list 
   const [applicants, setApplicants] = useState([
     { id: 1, name: 'Carpio, Aleck Joy', college: 'College of Technology', program: 'Bachelor of Science in Information Technology', status: 'Pending' },
     { id: 2, name: 'Dela Cruz, Juan', college: 'College of Business Administration', program: 'Bachelor of Science in Business Administration', status: 'Pending' },
