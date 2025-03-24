@@ -79,7 +79,7 @@ export default function ApplicantList() {
             onClick={() => setShowAddModal(true)}
             className="flex items-center border px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200"
           >
-            <BsThreeDotsVertical className="mr-2" /> Add Applicant
+            <BsThreeDotsVertical className="mr-2" /> Action
           </button>
 
           {/* Toggle Filter Panel */}
