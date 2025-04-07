@@ -3,33 +3,44 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
 
-include "db_connect.php";
+include 'db_connect.php';
 
+// Get JSON input
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Sanitize & assign values
-$name = trim($data["name"]);
-$college = trim($data["college"]);
-$schoolYear = trim($data["schoolYear"]);
-$program = trim($data["program"]);
-$status = trim($data["status"]);
-$notification = trim($data["notification"]);
-
-// ✅ VALIDATION: Block blank entries
-if ($name === "" || $college === "" || $schoolYear === "" || $program === "" || $status === "") {
-    echo json_encode(["success" => false, "message" => "All fields except notification are required."]);
+// Check for valid input
+if (!$data || !isset($data['first_name']) || !isset($data['last_name']) || !isset($data['status'])) {
+    echo json_encode(['success' => false, 'error' => 'Missing or invalid input data.']);
     exit;
 }
 
-// Proceed with DB insert
-$sql = "INSERT INTO applicants (applicant_name, college, school_year, program, status, notification)
-        VALUES ('$name', '$college', '$schoolYear', '$program', '$status', '$notification')";
+$first_name = $conn->real_escape_string($data['first_name']);
+$last_name = $conn->real_escape_string($data['last_name']);
+$status = $conn->real_escape_string($data['status']);
 
-if ($conn->query($sql) === TRUE) {
-    echo json_encode(["success" => true, "message" => "Applicant added successfully."]);
+$response = [];
+
+// Insert into applicants table
+$sql1 = "INSERT INTO applicants (first_name, last_name) VALUES ('$first_name', '$last_name')";
+
+if ($conn->query($sql1)) {
+    $applicant_ID = $conn->insert_id;
+
+    // Insert into applications table without notification
+    $sql2 = "INSERT INTO applications (applicant_ID, application_status) 
+             VALUES ('$applicant_ID', '$status')";
+
+    if ($conn->query($sql2)) {
+        $response['success'] = true;
+    } else {
+        $response['success'] = false;
+        $response['error'] = "Application insert failed: " . $conn->error;
+    }
 } else {
-    echo json_encode(["success" => false, "message" => "Error: " . $conn->error]);
+    $response['success'] = false;
+    $response['error'] = "Applicant insert failed: " . $conn->error;
 }
 
+echo json_encode($response);
 $conn->close();
 ?>

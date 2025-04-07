@@ -19,35 +19,28 @@ export default function ApplicantList() {
 
   // State to hold input values for new applicant form
   const [newApplicant, setNewApplicant] = useState({
-    name: '',
-    college: '',
-    schoolYear: '',
-    program: '',
+    first_name: '',
+    last_name: '',
     status: 'Pending',
-    notification: ''
-  });
+  });  
 
   useEffect(() => {
     fetch("http://localhost/Application-Status-Tracking/Tracker/php/get_applicants.php")
       .then((response) => response.json())
       .then((data) => {
-        // Convert data to match React field names if needed
         const formatted = data.map(a => ({
           id: a.id,
-          name: a.applicant_name,
-          college: a.college,
-          schoolYear: a.school_year,
-          program: a.program,
+          name: `${a.first_name} ${a.last_name}`, // ✅ Combine first and last name
           status: a.status,
-          notification: a.notification
         }));
         setApplicants(formatted);
       })
       .catch((error) => console.error("Error fetching applicants:", error));
   }, []);
+  
 
   // List of available statuses for filter and dropdown
-  const statusOptions = ['Pending', 'Under Review', 'Missing', 'Rejected', 'Accepted', 'Overdue'];
+  const statusOptions = ['Pending', 'Rejected', 'Accepted'];
 
   // Compute filtered applicant list based on search and selected statuses
   const filteredApplicants = useMemo(() => {
@@ -72,7 +65,7 @@ export default function ApplicantList() {
         if (data.success) {
           alert("Applicant added successfully.");
           setShowAddModal(false);
-          setNewApplicant({ name: '', college: '', schoolYear: '', program: '', status: 'Pending', notification: '' });
+          setNewApplicant({ first_name: '', last_name: '', status: 'Pending'});
   
           // Reload updated list
           fetch("http://localhost/Application-Status-Tracking/Tracker/php/get_applicants.php")
@@ -80,12 +73,8 @@ export default function ApplicantList() {
             .then((data) => {
               const formatted = data.map(a => ({
                 id: a.id,
-                name: a.applicant_name,
-                college: a.college,
-                schoolYear: a.school_year,
-                program: a.program,
+                name: `${a.first_name} ${a.last_name}`,
                 status: a.status,
-                notification: a.notification
               }));
               setApplicants(formatted);
             });
@@ -96,13 +85,14 @@ export default function ApplicantList() {
       .catch((error) => console.error("Error adding applicant:", error));
   };
   
-  const handleUpdateStatus = (id, newStatus, notification = '') => {
+  
+  const handleUpdateStatus = (id, newStatus) => {
     fetch("http://localhost/Application-Status-Tracking/Tracker/php/update_status.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ id, status: newStatus, notification })
+      body: JSON.stringify({ id, status: newStatus })
     })
       .then(response => response.json())
       .then(data => {
@@ -119,7 +109,6 @@ export default function ApplicantList() {
                 schoolYear: a.school_year,
                 program: a.program,
                 status: a.status,
-                notification: a.notification
               }));
               setApplicants(formatted);
             });
@@ -240,49 +229,32 @@ export default function ApplicantList() {
           <div className="bg-white p-6 rounded-lg w-[400px] shadow-xl">
             <h2 className="text-lg font-bold mb-4">Add New Applicant</h2>
             <div className="space-y-3">
-              <input
-                type="text"
-                placeholder="Name"
-                value={newApplicant.name}
-                onChange={(e) => setNewApplicant({ ...newApplicant, name: e.target.value })}
-                className="w-full border px-3 py-2 rounded"
-              />
-              <input
-                type="text"
-                placeholder="College"
-                value={newApplicant.college}
-                onChange={(e) => setNewApplicant({ ...newApplicant, college: e.target.value })}
-                className="w-full border px-3 py-2 rounded"
-              />
-              <input
-                type="text"
-                placeholder="School Year"
-                value={newApplicant.schoolYear}
-                onChange={(e) => setNewApplicant({ ...newApplicant, schoolYear: e.target.value })}
-                className="w-full border px-3 py-2 rounded"
-              />
-              <input
-                type="text"
-                placeholder="Program"
-                value={newApplicant.program}
-                onChange={(e) => setNewApplicant({ ...newApplicant, program: e.target.value })}
-                className="w-full border px-3 py-2 rounded"
-              />
-              <select
-                value={newApplicant.status}
-                onChange={(e) => setNewApplicant({ ...newApplicant, status: e.target.value })}
-                className="w-full border px-3 py-2 rounded"
-              >
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>{status}</option>
-                ))}
-              </select>
-              <textarea
-                placeholder="Notification message to send to applicant"
-                value={newApplicant.notification}
-                onChange={(e) => setNewApplicant({ ...newApplicant, notification: e.target.value })}
-                className="w-full border px-3 py-2 rounded"
-              />
+            <input
+              type="text"
+              placeholder="First Name"
+              value={newApplicant.first_name}
+              onChange={(e) => setNewApplicant({ ...newApplicant, first_name: e.target.value })}
+              className="w-full border px-3 py-2 rounded"
+            />
+
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={newApplicant.last_name}
+              onChange={(e) => setNewApplicant({ ...newApplicant, last_name: e.target.value })}
+              className="w-full border px-3 py-2 rounded"
+            />
+
+            <select
+              value={newApplicant.status}
+              onChange={(e) => setNewApplicant({ ...newApplicant, status: e.target.value })}
+              className="w-full border px-3 py-2 rounded"
+            >
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <button onClick={() => setShowAddModal(false)} className="px-3 py-2 bg-gray-200 rounded">Cancel</button>

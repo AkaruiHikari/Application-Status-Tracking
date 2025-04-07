@@ -2,7 +2,7 @@
 $host = "localhost";
 $username = "root"; // default for XAMPP
 $password = "";     // leave empty if you're using default XAMPP
-$database = "applicant_tracking";
+$database = "college_applications";
 
 // Create connection
 $conn = new mysqli($host, $username, $password, $database);
