@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 
 
 
+
 function Header() {
   return (
     <header className='bg-purple-700 text-white px-7 py-2 flex justify-between items-center '>

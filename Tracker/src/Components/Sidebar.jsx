@@ -4,14 +4,8 @@ import React from 'react';
 
 
 const menuItems = [
-  { label: 'Home', icon: <FaHome />, path: '/' },
-  { label: 'Applicants', icon: <FaUserFriends />, path: '/applicants' },
-  { label: 'Admission', icon: <FaGraduationCap />, path: '/admission' },
-  { label: 'Criteria', icon: <FaClipboardList />, path: '/criteria' },
-  { label: 'Interview Scheduling', icon: <FaCalendarAlt />, path: '/interview-scheduling' },
-  { label: 'Test Scheduling', icon: <FaFileAlt />, path: '/test-scheduling' },
-  { label: 'Admission Result', icon: <FaCheckCircle />, path: '/admission-result' },
-  { label: 'User Management', icon: <FaUsersCog />, path: '/user-management' },
+  { label: 'Home', icon: <FaHome />, path: '/' }
+  
 ];
 
 export default function Sidebar() {
