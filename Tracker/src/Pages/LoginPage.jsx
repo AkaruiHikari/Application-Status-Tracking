@@ -19,13 +19,15 @@ export default function LoginPage() {
     fetch("http://localhost/Application-Status-Tracking/Tracker/php/login.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, role })
+      body: JSON.stringify({ email, password }) // remove role
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           alert(`Welcome ${data.role}`);
-          localStorage.setItem("user", JSON.stringify(data.user));
+      
+          localStorage.setItem('email', data.user.email); // store the email
+          
           if (data.role === "admin") navigate("/admin");
           else if (data.role === "student") navigate("/notification");
         } else {
@@ -37,6 +39,7 @@ export default function LoginPage() {
         alert("Login error. See console.");
       });
   };
+  
   
   
   return (

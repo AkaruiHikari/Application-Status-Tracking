@@ -1,38 +1,28 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
-export default function NotificationPanel({ applicants }) {
+export default function NotificationPanel({ email }) {
+  const [notifications, setNotifications] = useState([]);
   const [sortNewest, setSortNewest] = useState(true);
 
-  // Extract only applicants with a custom notification message
-  const notifications = useMemo(() => {
-    return applicants
-      .filter((a) => a.notification && a.notification.trim() !== '')
-      .map((a) => ({
-        id: a.id,
-        title: a.name,
-        message: a.notification,
-        status: a.status,
-        timeAgo: '4 minutes ago',
-      }));
-  }, [applicants]);
+  useEffect(() => {
+    console.log("Email for fetching notifications:", email);
+    if (!email) return;
+
+    fetch(`http://localhost/Application-Status-Tracking/Tracker/php/get_notifications.php?email=${email}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setNotifications(data);
+      })
+      .catch((error) => console.error("Error fetching notifications:", error));
+  }, [email]);
 
   const sortedNotifications = useMemo(() => {
-    return [...notifications].sort((a, b) => (sortNewest ? b.id - a.id : a.id - b.id));
+    return [...notifications].sort((a, b) => (sortNewest ? new Date(b.timestamp) - new Date(a.timestamp) : new Date(a.timestamp) - new Date(b.timestamp)));
   }, [notifications, sortNewest]);
-
-  const statusColors = {
-    Accepted: 'bg-green-100 text-green-700',
-    'Under Review': 'bg-yellow-100 text-yellow-700',
-    'Interview Scheduled': 'bg-green-100 text-green-700',
-    'Pending Submission': 'bg-green-100 text-green-700',
-    Overdue: 'bg-red-100 text-red-700',
-    Missing: 'bg-red-100 text-red-700',
-    Reviewed: 'bg-green-100 text-green-700',
-  };
 
   return (
     <div className="p-6 max-full mx-auto">
-      <h2 className="text-2xl font-bold mb-4">NOTIFICATION</h2>
+      <h2 className="text-2xl font-bold mb-4">NOTIFICATIONS</h2>
       <div className="bg-white shadow rounded">
         <div className="flex justify-between items-center px-4 py-2 border-b">
           <div className="flex items-center gap-2">
@@ -51,27 +41,20 @@ export default function NotificationPanel({ applicants }) {
         <ul>
           {sortedNotifications.map((notif) => (
             <li
-              key={notif.id}
+              key={notif.notification_ID}
               className="flex items-start gap-3 px-4 py-3 border-b hover:bg-gray-50"
             >
               <input type="checkbox" className="mt-1" />
               <div className="flex-1">
                 <div className="font-semibold text-sm truncate max-w-[90%]">
-                  {notif.title}
+                  Notification
                 </div>
                 <div className="text-xs text-gray-600 truncate max-w-[90%]">
                   {notif.message}
                 </div>
               </div>
               <div className="flex flex-col items-end text-xs text-gray-500">
-                <span
-                  className={`px-2 py-1 rounded text-xs font-medium ${
-                    statusColors[notif.status] || 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  {notif.status}
-                </span>
-                <span>{notif.timeAgo}</span>
+                <span>{new Date(notif.timestamp).toLocaleDateString()}</span>
               </div>
             </li>
           ))}

@@ -23,13 +23,24 @@ $result = $conn->query($sql);
 if ($result && $result->num_rows > 0) {
     $user = $result->fetch_assoc();
 
+    // Now find the applicant_ID matching this email
+    $sql2 = "SELECT applicant_ID FROM applicants WHERE email_address = '$email' LIMIT 1";
+    $result2 = $conn->query($sql2);
+
+    if ($result2 && $result2->num_rows > 0) {
+        $applicant = $result2->fetch_assoc();
+        $applicant_ID = $applicant['applicant_ID'];
+    } else {
+        $applicant_ID = null; 
+    }
+
     echo json_encode([
         'success' => true,
         'role' => $user['role'],
         'user' => [
             'id' => $user['id'],
             'email' => $user['email'],
-            'role' => $user['role']
+            'role' => $user['role'],
         ]
     ]);
 } else {
