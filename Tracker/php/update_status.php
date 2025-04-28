@@ -5,27 +5,25 @@ header("Content-Type: application/json");
 
 include 'db_connect.php';
 
+// Read incoming JSON
 $data = json_decode(file_get_contents("php://input"), true);
 
-$applicant_ID = (int)$data['id']; // Comes from frontend as `id`
-$status = $conn->real_escape_string($data['status']);
-$notification = $conn->real_escape_string($data['notification']);
+// Check if both 'id' and 'status' are provided
+if (isset($data['id']) && isset($data['status'])) {
+    $id = (int) $data['id'];
+    $status = $conn->real_escape_string($data['status']);
 
-$sql = "UPDATE applications 
-        SET application_status = '$status', notification = '$notification'
-        WHERE applicant_ID = $applicant_ID";
+    // Update the 'application_status' in the 'applications' table
+    $sql = "UPDATE applications SET application_status = '$status' WHERE applicant_ID = $id";
 
-$response = [];
-
-if ($conn->query($sql)) {
-  $response['success'] = true;
+    if ($conn->query($sql)) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => $conn->error]);
+    }
 } else {
-  $response['success'] = false;
-  $response['error'] = $conn->error;
+    echo json_encode(['success' => false, 'error' => 'Missing id or status']);
 }
 
-header('Content-Type: application/json');
-echo json_encode($response);
 $conn->close();
-?>
 ?>
