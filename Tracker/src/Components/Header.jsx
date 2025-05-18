@@ -5,6 +5,7 @@ import notificationIcon from "../assets/core/Notification-Icon.png";
 import profileIcon from "../assets/core/Profile-Icon.png";
 import menuIcon from "../assets/core/Menu-Icon.png"; // Add this import
 
+
 export default function Header({ toggleSidebar }) {
   return (
     <header className="bg-[linear-gradient(to_right,_#6a11cb,_#a044ff)] h-24 flex items-center justify-between pr-10 py-3">
@@ -25,7 +26,7 @@ export default function Header({ toggleSidebar }) {
         </h1>
       </div>
       <div className="max-sm:hidden flex">
-        <Link to="/applicants">
+        <Link to="/notification">
           <img
             className="h-5 ml-5 cursor-pointer filter brightness-0 invert"
             src={notificationIcon}
