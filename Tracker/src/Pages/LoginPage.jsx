@@ -1,33 +1,36 @@
+// src/pages/LoginPage.jsx
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import Logo from '../assets/Images/Logo.png'
 import { useNavigate } from 'react-router-dom';
 
-
 export default function LoginPage() {
-  const [role, setRole] = useState('admin')
-
-  const handleRoleChange = (newRole) => setRole(newRole)
-  
+  const [role, setRole] = useState('admin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); 
-  
+  const navigate = useNavigate();
+
+  const handleRoleChange = (newRole) => setRole(newRole);
+
   const handleLogin = (e) => {
     e.preventDefault();
-  
+
     fetch("http://localhost/Application-Status-Tracking/Tracker/php/login.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }) // remove role
+      body: JSON.stringify({ email, password, role })
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
+          if (data.role !== role) {
+            alert(`You must log in as a ${data.role}`);
+            return;
+          }
+
           alert(`Welcome ${data.role}`);
-      
-          localStorage.setItem('email', data.user.email); // store the email
-          
+          localStorage.setItem('email', data.user.email);
+
           if (data.role === "admin") navigate("/admin");
           else if (data.role === "student") navigate("/notification");
         } else {
@@ -39,9 +42,7 @@ export default function LoginPage() {
         alert("Login error. See console.");
       });
   };
-  
-  
-  
+
   return (
     <div className="flex h-screen bg-gradient-to-b from-purple-800 to-purple-400">
       <div className="m-auto w-full max-w-md p-6 bg-white rounded-2xl shadow-xl">
@@ -50,11 +51,7 @@ export default function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center"
         >
-          <img
-            src={Logo}
-            alt="University Logo"
-            className="w-40 h-30 mb-2"
-          />
+          <img src={Logo} alt="University Logo" className="w-40 h-30 mb-2" />
           <h1 className="text-3xl font-bold text-center text-purple-700">
             TOM YANG UNIVERSITY
           </h1>
@@ -107,5 +104,5 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
-  )
+  );
 }
