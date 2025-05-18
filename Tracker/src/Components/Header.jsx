@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import phoneIcon from "../assets/core/Phone-Icon.png";
 import notificationIcon from "../assets/core/Notification-Icon.png";
 import profileIcon from "../assets/core/Profile-Icon.png";
@@ -7,7 +7,7 @@ import menuIcon from "../assets/core/Menu-Icon.png";
 import logoutIcon from "../assets/core/Logout-Icon.png";
 
 export default function Header({ toggleSidebar }) {
-
+  const navigate = useNavigate();
     const handleLogout = () => {
     localStorage.clear();
     navigate("/");
@@ -46,7 +46,7 @@ export default function Header({ toggleSidebar }) {
           alt="Profile"
         />
         <img
-          className="h-5 cursor-pointer filter brightness-0 invert"
+          className="h-5 ml-5 cursor-pointer filter brightness-0 invert"
           src={logoutIcon}
           alt="Logout"
           onClick={handleLogout}

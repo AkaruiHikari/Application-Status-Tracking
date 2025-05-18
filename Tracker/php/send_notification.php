@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Asia/Manila');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -11,11 +12,14 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 $email = $data['email_address'] ?? null;
 $message = $data['message'] ?? null;
+$subject = $data['subject'] ?? null; 
+$status = $data['status'] ?? null;   
+
 $response = [];
 
 // Basic validation
-if (!$email || !$message) {
-    echo json_encode(["success" => false, "error" => "Missing email or message"]);
+if (!$email || !$message || !$subject || !$status) {
+    echo json_encode(["success" => false, "error" => "Missing fields"]);
     exit;
 }
 
@@ -28,9 +32,9 @@ if ($result && $result->num_rows > 0) {
     $applicant_ID = $row['applicant_ID'];
 
     // 2. Insert into notifications table
-    $timestamp = date('Y-m-d H:i:s'); // current timestamp
-    $insert_sql = "INSERT INTO notifications (applicant_ID, message, timestamp) 
-                   VALUES ('$applicant_ID', '$message', '$timestamp')";
+    $timestamp = date('Y-m-d H:i:s');
+    $insert_sql = "INSERT INTO notifications (applicant_ID, subject, status, message, timestamp) 
+                   VALUES ('$applicant_ID', '$subject', '$status', '$message', '$timestamp')";
 
     if ($conn->query($insert_sql)) {
         $response['success'] = true;
@@ -45,4 +49,5 @@ if ($result && $result->num_rows > 0) {
 
 echo json_encode($response);
 $conn->close();
+
 ?>

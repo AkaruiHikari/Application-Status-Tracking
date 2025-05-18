@@ -24,6 +24,8 @@ export default function ApplicantList() {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedApplicantId, setSelectedApplicantId] = useState(null);
   const [newStatus, setNewStatus] = useState('Pending');
+  const [notifySubject, setNotifySubject] = useState('');
+  const [notifyStatus, setNotifyStatus] = useState('Pending');
 
   const openNotifyModal = (email) => {
     setSelectedEmail(email);
@@ -92,6 +94,8 @@ export default function ApplicantList() {
       },
       body: JSON.stringify({
         email_address: selectedEmail,
+        subject: notifySubject,
+        status: notifyStatus,
         message: notifyMessage
       })
     })
@@ -476,7 +480,7 @@ export default function ApplicantList() {
           </div>
         )}
 
-        {/* Notification Modal */}
+       {/* Notification Modal */}
         {showNotifyModal && (
           <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 overflow-auto">
             <div className="bg-white p-6 rounded-lg w-[500px] shadow-xl">
@@ -489,6 +493,22 @@ export default function ApplicantList() {
                     disabled
                     className="w-full border px-3 py-2 rounded bg-gray-100 text-gray-500"
                   />
+                  <input
+                    type="text"
+                    placeholder="Subject"
+                    value={notifySubject}
+                    onChange={(e) => setNotifySubject(e.target.value)}
+                    className="w-full border px-3 py-2 rounded"
+                  />
+                  <select
+                    value={notifyStatus}
+                    onChange={(e) => setNotifyStatus(e.target.value)}
+                    className="w-full border px-3 py-2 rounded"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
                   <textarea
                     placeholder="Type your message here..."
                     value={notifyMessage}
@@ -508,6 +528,7 @@ export default function ApplicantList() {
             </div>
           </div>
         )}
+
 
         {/* Update Status Modal */}
         {showUpdateModal && (
