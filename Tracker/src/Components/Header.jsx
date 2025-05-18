@@ -3,10 +3,17 @@ import { Link } from "react-router-dom";
 import phoneIcon from "../assets/core/Phone-Icon.png";
 import notificationIcon from "../assets/core/Notification-Icon.png";
 import profileIcon from "../assets/core/Profile-Icon.png";
-import menuIcon from "../assets/core/Menu-Icon.png"; // Add this import
-
+import menuIcon from "../assets/core/Menu-Icon.png"; 
+import logoutIcon from "../assets/core/Logout-Icon.png";
 
 export default function Header({ toggleSidebar }) {
+
+    const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
+    };
+
+
   return (
     <header className="bg-[linear-gradient(to_right,_#6a11cb,_#a044ff)] h-24 flex items-center justify-between pr-10 py-3">
       <div className="flex items-center">
@@ -37,6 +44,13 @@ export default function Header({ toggleSidebar }) {
           className="h-5 ml-5 cursor-pointer filter brightness-0 invert"
           src={profileIcon}
           alt="Profile"
+        />
+        <img
+          className="h-5 cursor-pointer filter brightness-0 invert"
+          src={logoutIcon}
+          alt="Logout"
+          onClick={handleLogout}
+          title="Logout"
         />
       </div>
     </header>
