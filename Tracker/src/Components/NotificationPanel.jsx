@@ -32,6 +32,14 @@ export default function NotificationPanel({ email }) {
     );
   };
 
+  const toggleSelectAll = () => {
+    if (selected.length === notifications.length) {
+      setSelected([]);
+    } else {
+      setSelected(notifications.map((n) => n.notification_ID));
+    }
+  };
+
   const deleteSelected = async () => {
     const confirmDelete = window.confirm('Are you sure you want to delete the selected notifications?');
     if (!confirmDelete) return;
@@ -85,13 +93,24 @@ export default function NotificationPanel({ email }) {
           </div>
           <div className="text-sm flex items-center gap-4">
             {selected.length > 0 && (
-              <button
-                onClick={deleteSelected}
-                className="text-red-600 hover:text-red-700"
-                title="Delete selected"
-              >
-                <Trash2 size={18} />
-              </button>
+              <>
+                <label className="flex items-center gap-1 text-xs text-gray-700">
+                  <input
+                    type="checkbox"
+                    className="cursor-pointer"
+                    checked={selected.length === notifications.length}
+                    onChange={toggleSelectAll}
+                  />
+                  Select All
+                </label>
+                <button
+                  onClick={deleteSelected}
+                  className="text-red-600 hover:text-red-700"
+                  title="Delete selected"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </>
             )}
             <div className="relative">
               <span className="cursor-pointer select-none" onClick={() => setShowSortDropdown(!showSortDropdown)}>
@@ -127,19 +146,18 @@ export default function NotificationPanel({ email }) {
           {sortedNotifications.map((notif) => (
             <li
               key={notif.notification_ID}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition-all cursor-pointer"
-              onClick={() => setActiveNotification(notif)}
+              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition-all"
             >
               <input
                 type="checkbox"
-                className="mt-1"
+                className="mt-1 cursor-pointer"
                 checked={selected.includes(notif.notification_ID)}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  toggleSelect(notif.notification_ID);
-                }}
+                onChange={() => toggleSelect(notif.notification_ID)}
               />
-              <div className="flex-1">
+              <div
+                className="flex-1 cursor-pointer"
+                onClick={() => setActiveNotification(notif)}
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-sm text-black">
