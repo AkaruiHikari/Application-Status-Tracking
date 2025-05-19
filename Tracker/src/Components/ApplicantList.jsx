@@ -25,10 +25,33 @@ export default function ApplicantList() {
   const [appointmentApplicant, setAppointmentApplicant] = useState(null);
   const [appointmentData, setAppointmentData] = useState({
     date: '',
-    time: '',
+    startTime: '',
+    endTime: '',
     location: '',
-    notes: ''
+    notes: '',
+    type: 'Interview'
   });
+
+  const handleDeleteApplicant = (id) => {
+  if (!window.confirm("Are you sure you want to delete this applicant?")) return;
+
+  fetch("http://localhost/Application-Status-Tracking/Tracker/php/delete_applicant.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("Applicant deleted.");
+        setApplicants(applicants.filter(a => a.id !== id));
+      } else {
+        alert("Failed to delete applicant.");
+      }
+    })
+    .catch(error => console.error("Delete error:", error));
+};
+
 
   const openAppointmentModal = (applicant) => {
     setAppointmentApplicant(applicant);
@@ -37,14 +60,51 @@ export default function ApplicantList() {
 
   const handleScheduleAppointment = (e) => {
     e.preventDefault();
-    console.log({
-      applicant: appointmentApplicant,
-      ...appointmentData
+
+    const { date, startTime, endTime, location, notes, type } = appointmentData;
+    const email = appointmentApplicant?.email_address;
+    const formattedDate = new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
-    // Submit to backend or store here
-    setShowAppointmentModal(false);
-    setAppointmentData({ date: '', time: '', location: '', notes: '' });
+
+    const subject = `${type} on ${formattedDate}`;
+    const message = `Your appointed date and time is: ${date} from ${startTime} to ${endTime} at ${location}. ${notes}`;
+    const status = "Approved";
+
+    // Send appointment notification
+    fetch('http://localhost/Application-Status-Tracking/Tracker/php/send_notification.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email_address: email,
+        subject,
+        status,
+        message
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("Appointment scheduled and notification sent.");
+          setShowAppointmentModal(false);
+          setAppointmentData({
+            date: '',
+            time: '',
+            location: '',
+            notes: '',
+            type: 'Interview'
+          });
+        } else {
+          alert("Failed to send appointment notification.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error scheduling appointment:", error);
+      });
   };
+
 
 
   const openNotifyModal = (email) => {
@@ -337,7 +397,13 @@ export default function ApplicantList() {
                       onClick={() => openAppointmentModal(a)}
                       className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
                     >
-                      Appointment
+                      Schedule
+                    </button>
+                    <button
+                      onClick={() => handleDeleteApplicant(a.id)}
+                      className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
+                    >
+                      Delete
                     </button>
                   </div>
                 </td>
@@ -574,7 +640,7 @@ export default function ApplicantList() {
           </div>
         )}
 
-        {/* Appointment Modal */}
+      {/* Appointment Modal */}
       {showAppointmentModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 overflow-auto">
           <div className="bg-white p-6 rounded-lg w-[500px] shadow-xl">
@@ -587,19 +653,50 @@ export default function ApplicantList() {
                   disabled
                   className="w-full border px-3 py-2 rounded bg-gray-100 text-gray-500"
                 />
-                <input
-                  type="date"
-                  value={appointmentData.date}
-                  onChange={(e) => setAppointmentData({ ...appointmentData, date: e.target.value })}
+                <div>
+                  <label className="block font-medium text-sm mb-1">Appointment Date</label>
+                  <input
+                    type="date"
+                    value={appointmentData.date}
+                    onChange={(e) => setAppointmentData({ ...appointmentData, date: e.target.value })}
+                    className="w-full border px-3 py-2 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium text-sm mb-1">Time Range</label>
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-col flex-1">
+                      <label className="text-xs text-gray-600 mb-1">Start Time</label>
+                      <input
+                        type="time"
+                        value={appointmentData.startTime}
+                        onChange={(e) => setAppointmentData({ ...appointmentData, startTime: e.target.value })}
+                        className="w-full border px-3 py-2 rounded"
+                      />
+                    </div>
+
+                    <span className="text-sm font-semibold text-gray-700 pt-5">to</span>
+
+                    <div className="flex flex-col flex-1">
+                      <label className="text-xs text-gray-600 mb-1">End Time</label>
+                      <input
+                        type="time"
+                        value={appointmentData.endTime}
+                        onChange={(e) => setAppointmentData({ ...appointmentData, endTime: e.target.value })}
+                        className="w-full border px-3 py-2 rounded"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <select
+                  value={appointmentData.type}
+                  onChange={(e) => setAppointmentData({ ...appointmentData, type: e.target.value })}
                   className="w-full border px-3 py-2 rounded"
-                />
-                <input
-                  type="text"
-                  placeholder="Enter appointment time (e.g., 11:00 AM - 11:30 AM)"
-                  value={appointmentData.time}
-                  onChange={(e) => setAppointmentData({ ...appointmentData, time: e.target.value })}
-                  className="w-full border px-3 py-2 rounded"
-                />
+                >
+                  <option value="Interview">Interview</option>
+                  <option value="Test">Test</option>
+                </select>
                 <input
                   type="text"
                   placeholder="Enter location"
