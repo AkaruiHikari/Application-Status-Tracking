@@ -11,7 +11,8 @@ $sql = "SELECT
             a.email_address,
             ap.application_status AS status,
             c.first_course,
-            c.second_course
+            c.second_course,
+            c.school_year
         FROM applicants a
         LEFT JOIN applications ap ON ap.applicant_ID = a.applicant_ID
         LEFT JOIN courses c ON c.application_ID = ap.application_ID
