@@ -1,23 +1,18 @@
-import { useState, useMemo } from 'react';
-import { useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { IoIosArrowDown } from 'react-icons/io';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 
 export default function ApplicantList() {
-  // State for search input
+  const currentYear = new Date().getFullYear();
+  const autoSchoolYear = `${currentYear}-${currentYear + 4}`;
+
   const [search, setSearch] = useState('');
-  // State to show/hide status filter
   const [showFilter, setShowFilter] = useState(false);
-  // State to hold selected status filters
   const [selectedStatuses, setSelectedStatuses] = useState([]);
-  // State to show/hide Add Applicant modal
   const [showAddModal, setShowAddModal] = useState(false);
-  // List of available statuses for filter and dropdown
-  const statusOptions = ['Pending', 'Rejected', 'Approved'];
-  // Main applicant list 
+  const [statusOptions] = useState(['Pending', 'Rejected', 'Approved']);
   const [applicants, setApplicants] = useState([]);
-  // State to show/hide Notify Modal
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [notifyMessage, setNotifyMessage] = useState('');
   const [showNotifyModal, setShowNotifyModal] = useState(false);
@@ -31,7 +26,7 @@ export default function ApplicantList() {
     setSelectedEmail(email);
     setShowNotifyModal(true);
   };
-  
+
   const courseOptions = [
     "Bachelor of Science in Information Technology",
     "Bachelor of Science in Computer Science",
@@ -41,8 +36,7 @@ export default function ApplicantList() {
     "Bachelor of Arts in Political Science",
     "Bachelor of Arts in Communication",
   ];
-  
-  // State to hold input values for new applicant form
+
   const [newApplicant, setNewApplicant] = useState({
     first_name: '',
     middle_name: '',
@@ -61,10 +55,9 @@ export default function ApplicantList() {
     contact_number: '',
     first_course: '',
     second_course: '',
+    school_year: autoSchoolYear,
     status: 'Pending',
   });
-  
-  
 
   useEffect(() => {
     fetch("http://localhost/Application-Status-Tracking/Tracker/php/get_applicants.php")
@@ -75,23 +68,20 @@ export default function ApplicantList() {
           name: `${a.first_name} ${a.last_name}`,
           first_course: a.first_course,
           second_course: a.second_course,
+          school_year: a.school_year,
           status: a.status,
           email_address: a.email_address
-        }));        
+        }));
         setApplicants(formatted);
       })
       .catch((error) => console.error("Error fetching applicants:", error));
   }, []);
-  
 
   const handleSendNotification = (e) => {
     e.preventDefault();
-  
     fetch('http://localhost/Application-Status-Tracking/Tracker/php/send_notification.php', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email_address: selectedEmail,
         subject: notifySubject,
@@ -99,21 +89,19 @@ export default function ApplicantList() {
         message: notifyMessage
       })
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Notification sent successfully!');
-        setShowNotifyModal(false);
-        setNotifyMessage('');
-      } else {
-        alert('Failed to send notification.');
-      }
-    })
-    .catch(error => console.error('Error sending notification:', error));
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Notification sent successfully!');
+          setShowNotifyModal(false);
+          setNotifyMessage('');
+        } else {
+          alert('Failed to send notification.');
+        }
+      })
+      .catch(error => console.error('Error sending notification:', error));
   };
-  
 
-  // Compute filtered applicant list based on search and selected statuses
   const filteredApplicants = useMemo(() => {
     return applicants.filter((a) => {
       const matchesSearch = a.name.toLowerCase().includes(search.toLowerCase());
@@ -122,27 +110,20 @@ export default function ApplicantList() {
     });
   }, [search, selectedStatuses, applicants]);
 
-  // Add new applicant to the state list and close modal
   const handleAddApplicant = (e) => {
     if (e) e.preventDefault();
-  
-
     if (!newApplicant.first_name || !newApplicant.last_name || !newApplicant.status) {
       alert("Please fill out First Name, Last Name, and select Status.");
       return;
     }
-    console.log("Submitting new applicant:", newApplicant);
 
     fetch("http://localhost/Application-Status-Tracking/Tracker/php/add_applicant.php", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newApplicant)
     })
       .then(response => response.json())
       .then(data => {
-        console.log("Server response:", data);
         if (data.success) {
           alert("Applicant added successfully.");
           setShowAddModal(false);
@@ -162,12 +143,12 @@ export default function ApplicantList() {
             number_of_siblings: '',
             email_address: '',
             contact_number: '',
-            status: 'Pending',
             first_course: '',
-            second_course: ''
+            second_course: '',
+            school_year: autoSchoolYear,
+            status: 'Pending',
           });
-          
-  
+
           // Reload updated list
           fetch("http://localhost/Application-Status-Tracking/Tracker/php/get_applicants.php")
             .then((response) => response.json())
@@ -177,6 +158,7 @@ export default function ApplicantList() {
                 name: `${a.first_name} ${a.last_name}`,
                 first_course: a.first_course,
                 second_course: a.second_course,
+                school_year: a.school_year,
                 status: a.status,
                 email_address: a.email_address
               }));
@@ -184,27 +166,21 @@ export default function ApplicantList() {
             });
         } else {
           alert("Failed to add applicant.");
-          console.error("Error:", data.error);
         }
       })
       .catch((error) => console.error("Error adding applicant:", error));
   };
-  
-  
-  
+
   const handleUpdateStatus = (id, newStatus) => {
     fetch("http://localhost/Application-Status-Tracking/Tracker/php/update_status.php", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, status: newStatus })
     })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
           alert("Status updated.");
-          // Refresh applicant list
           fetch("http://localhost/Application-Status-Tracking/Tracker/php/get_applicants.php")
             .then((response) => response.json())
             .then((data) => {
@@ -213,18 +189,18 @@ export default function ApplicantList() {
                 name: `${a.first_name} ${a.last_name}`,
                 first_course: a.first_course,
                 second_course: a.second_course,
+                school_year: a.school_year,
                 status: a.status,
                 email_address: a.email_address
               }));
               setApplicants(formatted);
-            });            
+            });
         } else {
           alert("Failed to update status.");
         }
       })
       .catch((error) => console.error("Error updating status:", error));
   };
-  
 
   return (
     <div className="p-6 w-full">
@@ -298,6 +274,7 @@ export default function ApplicantList() {
               <th className="border border-black px-2 py-1">Applicants Name</th>
               <th className="border border-black px-2 py-1">First Course</th>
               <th className="border border-black px-2 py-1">Second Course</th>
+              <th className="border border-black px-2 py-1">School Year</th>
               <th className="border border-black px-2 py-1">Status</th>
               <th className="border border-black px-2 py-1">Action</th>
               
@@ -310,6 +287,7 @@ export default function ApplicantList() {
                 <td className="border border-black px-2 py-1">{a.name}</td>
                 <td className="border border-black px-2 py-1">{a.first_course}</td>
                 <td className="border border-black px-2 py-1">{a.second_course}</td>
+                <td className="border border-black px-2 py-1">{a.school_year}</td>
                 <td className="border border-black px-2 py-1">{a.status}</td>
                 <td className="border border-black px-2 py-1 w-[120px]">
                   <div className="flex gap-1 justify-center">

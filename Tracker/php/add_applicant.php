@@ -31,6 +31,9 @@ $email_address = $conn->real_escape_string($data['email_address']);
 $contact_number = $conn->real_escape_string($data['contact_number']);
 $first_course = $conn->real_escape_string($data['first_course']);
 $second_course = $conn->real_escape_string($data['second_course']);
+$startYear = date('Y'); // e.g., 2025
+$endYear = $startYear + 4;
+$school_year = "$startYear-$endYear";
 $status = $conn->real_escape_string($data['status']);
 $today = date("Y-m-d");
 
@@ -69,8 +72,8 @@ if ($conn->query($sql)) {
         $application_ID = $conn->insert_id;
 
         // Insert into courses table
-        $sql3 = "INSERT INTO courses (first_course, second_course, application_ID)
-                 VALUES ('$first_course', '$second_course', '$application_ID')";
+        $sql3 = "INSERT INTO courses (first_course, second_course, application_ID, school_year)
+               VALUES ('$first_course', '$second_course', '$application_ID', '$school_year')";
 
         if ($conn->query($sql3)) {
             $response['success'] = true;

@@ -1,7 +1,8 @@
 <?php
-header("Access-Control-Allow-Origin: *"); // allow all origins
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // allow these methods
-header("Access-Control-Allow-Headers: Content-Type"); // allow Content-Type headers
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -18,35 +19,35 @@ if (!isset($data['email']) || !isset($data['password'])) {
 }
 
 $email = $conn->real_escape_string($data['email']);
-$password = $conn->real_escape_string($data['password']);
+$input_password = $data['password']; // do NOT escape — used in password_verify()
 
-// Query the users table
-$sql = "SELECT * FROM users WHERE email = '$email' AND password = '$password' LIMIT 1";
+// Query the users table by email only
+$sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
 $result = $conn->query($sql);
 
 if ($result && $result->num_rows > 0) {
     $user = $result->fetch_assoc();
+    $hashed_password = $user['password'];
 
-    // Now find the applicant_ID matching this email
-    $sql2 = "SELECT applicant_ID FROM applicants WHERE email_address = '$email' LIMIT 1";
-    $result2 = $conn->query($sql2);
+    if (password_verify($input_password, $hashed_password)) {
+        // Also check if this email belongs to an applicant
+        $sql2 = "SELECT applicant_ID FROM applicants WHERE email_address = '$email' LIMIT 1";
+        $result2 = $conn->query($sql2);
+        $applicant_ID = ($result2 && $result2->num_rows > 0) ? $result2->fetch_assoc()['applicant_ID'] : null;
 
-    if ($result2 && $result2->num_rows > 0) {
-        $applicant = $result2->fetch_assoc();
-        $applicant_ID = $applicant['applicant_ID'];
-    } else {
-        $applicant_ID = null; 
-    }
-
-    echo json_encode([
-        'success' => true,
-        'role' => $user['role'],
-        'user' => [
-            'id' => $user['id'],
-            'email' => $user['email'],
+        echo json_encode([
+            'success' => true,
             'role' => $user['role'],
-        ]
-    ]);
+            'user' => [
+                'id' => $user['id'],
+                'email' => $user['email'],
+                'role' => $user['role'],
+                'applicant_ID' => $applicant_ID
+            ]
+        ]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Invalid email or password']);
+    }
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid email or password']);
 }
