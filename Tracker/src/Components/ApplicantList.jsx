@@ -21,6 +21,31 @@ export default function ApplicantList() {
   const [newStatus, setNewStatus] = useState('Pending');
   const [notifySubject, setNotifySubject] = useState('');
   const [notifyStatus, setNotifyStatus] = useState('Pending');
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [appointmentApplicant, setAppointmentApplicant] = useState(null);
+  const [appointmentData, setAppointmentData] = useState({
+    date: '',
+    time: '',
+    location: '',
+    notes: ''
+  });
+
+  const openAppointmentModal = (applicant) => {
+    setAppointmentApplicant(applicant);
+    setShowAppointmentModal(true);
+  };
+
+  const handleScheduleAppointment = (e) => {
+    e.preventDefault();
+    console.log({
+      applicant: appointmentApplicant,
+      ...appointmentData
+    });
+    // Submit to backend or store here
+    setShowAppointmentModal(false);
+    setAppointmentData({ date: '', time: '', location: '', notes: '' });
+  };
+
 
   const openNotifyModal = (email) => {
     setSelectedEmail(email);
@@ -290,6 +315,7 @@ export default function ApplicantList() {
                 <td className="border border-black px-2 py-1">{a.school_year}</td>
                 <td className="border border-black px-2 py-1">{a.status}</td>
                 <td className="border border-black px-2 py-1 w-[120px]">
+                
                   <div className="flex gap-1 justify-center">
                     <button
                       onClick={() => openNotifyModal(a.email_address)}
@@ -306,6 +332,12 @@ export default function ApplicantList() {
                       className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
                     >
                       Update
+                    </button>
+                   <button
+                      onClick={() => openAppointmentModal(a)}
+                      className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
+                    >
+                      Appointment
                     </button>
                   </div>
                 </td>
@@ -541,6 +573,66 @@ export default function ApplicantList() {
             </div>
           </div>
         )}
+
+        {/* Appointment Modal */}
+      {showAppointmentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 overflow-auto">
+          <div className="bg-white p-6 rounded-lg w-[500px] shadow-xl">
+            <h2 className="text-lg font-bold mb-4">Schedule Appointment</h2>
+            <form onSubmit={handleScheduleAppointment}>
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  value={appointmentApplicant?.name || ''}
+                  disabled
+                  className="w-full border px-3 py-2 rounded bg-gray-100 text-gray-500"
+                />
+                <input
+                  type="date"
+                  value={appointmentData.date}
+                  onChange={(e) => setAppointmentData({ ...appointmentData, date: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                />
+                <input
+                  type="text"
+                  placeholder="Enter appointment time (e.g., 11:00 AM - 11:30 AM)"
+                  value={appointmentData.time}
+                  onChange={(e) => setAppointmentData({ ...appointmentData, time: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                />
+                <input
+                  type="text"
+                  placeholder="Enter location"
+                  value={appointmentData.location}
+                  onChange={(e) => setAppointmentData({ ...appointmentData, location: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                />
+                <textarea
+                  placeholder="Add any relevant notes..."
+                  value={appointmentData.notes}
+                  onChange={(e) => setAppointmentData({ ...appointmentData, notes: e.target.value })}
+                  className="w-full border px-3 py-2 rounded min-h-[100px]"
+                />
+              </div>
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  onClick={() => setShowAppointmentModal(false)}
+                  type="button"
+                  className="px-3 py-2 bg-gray-200 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-3 py-2 bg-green-600 text-white rounded"
+                >
+                  Schedule
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
 
     </div>
