@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { IoIosArrowDown } from 'react-icons/io';
-import { BsThreeDotsVertical } from 'react-icons/bs';
+import { FaUserPlus } from 'react-icons/fa';
 
 export default function ApplicantList() {
   const currentYear = new Date().getFullYear();
@@ -228,7 +228,7 @@ export default function ApplicantList() {
             onClick={() => setShowAddModal(true)}
             className="flex items-center border px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200"
           >
-            <BsThreeDotsVertical className="mr-2" /> Add Applicant
+            <FaUserPlus className="mr-2" />Add Applicant
           </button>
 
           {/* Toggle Filter Panel */}
