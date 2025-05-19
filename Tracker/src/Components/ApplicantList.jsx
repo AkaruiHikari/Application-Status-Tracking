@@ -15,7 +15,16 @@ export default function ApplicantList() {
   const [selectedSecondCourse, setSelectedSecondCourse] = useState('');
   const [sortByName, setSortByName] = useState(''); // 'asc' or 'desc'
   const [showAddModal, setShowAddModal] = useState(false);
-  const [statusOptions] = useState(['Pending', 'Rejected', 'Approved']);
+  const [statusOptions] = useState([
+    "Submitted",
+    "Under Review",
+    "Reviewed",
+    "Approved",
+    "Rejected",
+    "Cancelled",
+    "Scheduled",
+    "Interview Completed"
+  ]);
   const [applicants, setApplicants] = useState([]);
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [notifyMessage, setNotifyMessage] = useState('');
@@ -75,7 +84,7 @@ export default function ApplicantList() {
 
     const subject = `${type} on ${formattedDate}`;
     const message = `Your appointed date and time is: ${date} from ${startTime} to ${endTime} at ${location}. ${notes}`;
-    const status = "Approved";
+    const status = "Scheduled";
 
     // Send appointment notification
     fetch('http://localhost/Application-Status-Tracking/Tracker/php/send_notification.php', {
@@ -673,9 +682,9 @@ export default function ApplicantList() {
                     onChange={(e) => setNewStatus(e.target.value)}
                     className="w-full border px-3 py-2 rounded"
                   >
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
+                    {statusOptions.map((status) => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="mt-6 flex justify-end gap-2">
