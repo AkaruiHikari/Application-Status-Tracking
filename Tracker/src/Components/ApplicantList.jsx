@@ -578,7 +578,7 @@ export default function ApplicantList() {
       {showAppointmentModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 overflow-auto">
           <div className="bg-white p-6 rounded-lg w-[500px] shadow-xl">
-            <h2 className="text-lg font-bold mb-4">Schedule Appointment</h2>
+            <h2 className="text-lg font-bold mb-4">Schedule </h2>
             <form onSubmit={handleScheduleAppointment}>
               <div className="space-y-3">
                 <input
