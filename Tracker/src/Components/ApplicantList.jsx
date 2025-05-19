@@ -10,6 +10,10 @@ export default function ApplicantList() {
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [selectedSchoolYear, setSelectedSchoolYear] = useState('');
+  const [selectedFirstCourse, setSelectedFirstCourse] = useState('');
+  const [selectedSecondCourse, setSelectedSecondCourse] = useState('');
+  const [sortByName, setSortByName] = useState(''); // 'asc' or 'desc'
   const [showAddModal, setShowAddModal] = useState(false);
   const [statusOptions] = useState(['Pending', 'Rejected', 'Approved']);
   const [applicants, setApplicants] = useState([]);
@@ -347,6 +351,53 @@ export default function ApplicantList() {
               </label>
             ))}
           </div>
+          {/* Add these inside your filter panel after Filter by Status: */}
+
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <select
+              value={selectedSchoolYear}
+              onChange={(e) => setSelectedSchoolYear(e.target.value)}
+              className="border px-2 py-1 rounded"
+            >
+              <option value="">All School Years</option>
+              {[...new Set(applicants.map(a => a.school_year))].map((year, idx) => (
+                <option key={idx} value={year}>{year}</option>
+              ))}
+            </select>
+
+            <select
+              value={selectedFirstCourse}
+              onChange={(e) => setSelectedFirstCourse(e.target.value)}
+              className="border px-2 py-1 rounded"
+            >
+              <option value="">All First Courses</option>
+              {courseOptions.map((course, idx) => (
+                <option key={idx} value={course}>{course}</option>
+              ))}
+            </select>
+
+            <select
+              value={selectedSecondCourse}
+              onChange={(e) => setSelectedSecondCourse(e.target.value)}
+              className="border px-2 py-1 rounded"
+            >
+              <option value="">All Second Courses</option>
+              {courseOptions.map((course, idx) => (
+                <option key={idx} value={course}>{course}</option>
+              ))}
+            </select>
+
+            <select
+              value={sortByName}
+              onChange={(e) => setSortByName(e.target.value)}
+              className="border px-2 py-1 rounded"
+            >
+              <option value="">Name: Default</option>
+              <option value="asc">Name: A-Z</option>
+              <option value="desc">Name: Z-A</option>
+            </select>
+          </div>
+
         </div>
       )}
 
